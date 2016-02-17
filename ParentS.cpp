@@ -1,16 +1,11 @@
-#include "Follows.h"
+#include "ParentS.h"
 
-Follows::Follows(Clause clause)
-	:Clause(relType::follows, clause.getVar1Type(), clause.getVar1(), clause.getVar2Type(), clause.getVar2()) {
-
-}
-
-Follows::Follows(argType _var1Type, string _var1, argType _var2Type, string _var2)
-:Clause(relType::follows, _var1Type, _var1, _var2Type, _var2) {
+ParentS::ParentS(argType _var1Type, string _var1, argType _var2Type, string _var2)
+:Clause(relType::parentS, _var1Type, _var1, _var2Type, _var2) {
     
 }
 
-int Follows::getRelCase(){
+int ParentS::getRelCase(){
     
     if (var1Type == argType::stmt && var2Type == argType::stmt) {
         relCase = 1;
@@ -28,5 +23,4 @@ int Follows::getRelCase(){
     
     return 0;
 }
-
 

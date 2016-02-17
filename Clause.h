@@ -19,8 +19,12 @@ enum relCase {
 class Clause {
 public:
 	Clause(relType rel, argType _var1Type, string _var1, argType _var2Type, string _var2);
-	string getVar1();
+    argType getVar1Type();
+    argType getVar2Type();
+    string getVar1();
 	string getVar2();
+    relType getRelType();
+    
 	void displayRelType();
 protected:
 	relType type;
