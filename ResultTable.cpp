@@ -9,8 +9,6 @@ ResultTable::ResultTable(int num_tuples) {
     for (int i = 0; i < num_tuples; i++) {
         vector<vector<string>> new_tuple;
         head.push_back(new_tuple);
-        vector<string> hi;
-        finalTable.push_back(hi);
     }
 }
 
@@ -32,9 +30,7 @@ void ResultTable::mergeTable() {
     for (int i = 0; i < getNumTuples(); i++) {
         vector<vector<string>> variableSet = getVariableSet(i);
         if (variableSet.size() > 1) {
-            cout << "before merge: " << variableSet.size() << endl;
             variableSet = mergeVariableSet(variableSet);
-            cout << "after merge: " << variableSet.size() << endl;
         }
         finalTable.push_back(getClauseSet(0,variableSet));
     }
@@ -63,8 +59,8 @@ vector<vector<string>> ResultTable::mergeVariableSet(vector<vector<string>> vari
     return variableSet;
 }
 
-vector<string> ResultTable::getFinalResults() {
-    vector<string> finalResults;
+list<string> ResultTable::getFinalResults() {
+    list<string> finalResults;
     
     
     
@@ -148,8 +144,8 @@ void ResultTable::displayResultTable() {
     for (int i = 0; i < getNumTuples(); i++) {
         cout << "Tuple set " << i << endl;
         vector<vector<string>> variableSet = getVariableSet(i);
+		cout << "====================================================" << endl;
         for (int j = 0; j < variableSet.size(); j++) {
-            cout << "====================================================" << endl;
             vector<string> clauseSet = getClauseSet(j,variableSet);
             vector<string>::iterator it = clauseSet.begin();
             while (it != clauseSet.end()) {
@@ -157,7 +153,7 @@ void ResultTable::displayResultTable() {
                 it++;
             }
             cout << endl;
-            cout << "====================================================" << endl;
         }
+		cout << "====================================================" << endl;
     }
 }

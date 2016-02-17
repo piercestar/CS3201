@@ -22,7 +22,7 @@ public:
     void addClauseSet(int tuple_index,vector<string> clauseSet);
     void mergeTable();
     vector<vector<string>> mergeVariableSet(vector<vector<string>> variableSet);
-    vector<string> getFinalResults();
+    list<string> getFinalResults();
     
     // Test modules
     int getNumTuples();
