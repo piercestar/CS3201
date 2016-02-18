@@ -25,6 +25,13 @@ public:
 	string getVar2();
     relType getRelType();
     
+    	Modifies modifiesConverter(Clause clause);
+	Uses usesConverter(Clause clause);
+	Parent parentConverter(Clause clause);
+	ParentS parentSConverter(Clause clause);
+	Follows followsConverter(Clause clause);
+	FollowsS followsSConverter(Clause clause);
+	
 	void displayRelType();
 protected:
 	relType type;
