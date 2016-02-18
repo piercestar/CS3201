@@ -41,32 +41,32 @@ relType Clause::getRelType() {
     return type;
 }
 
-Modifies modifiesConverter(Clause clause) {
+Modifies Clause::modifiesConverter(Clause clause) {
     Modifies converted = Modifies(clause);
     return converted;
 }
 
-Uses UsesConverter(Clause clause) {
+Uses Clause::usesConverter(Clause clause) {
     Uses converted = Uses(clause);
     return converted;
 }
 
-Follows FollowsConverter(Clause clause) {
+Follows Clause::followsConverter(Clause clause) {
     Follows converted = Follows(clause);
     return converted;
 }
 
-FollowsS FollowsSConverter(Clause clause) {
+FollowsS Clause::followsSConverter(Clause clause) {
     FollowsS converted = FollowsS(clause);
     return converted;
 }
 
-Parent ParentConverter(Clause clause) {
+Parent Clause::parentConverter(Clause clause) {
     Parent converted = Parent(clause);
     return converted;
 }
 
-ParentS ParentSConverter(Clause clause) {
+ParentS Clause::parentSConverter(Clause clause) {
     ParentS converted = ParentS(clause);
     return converted;
 }

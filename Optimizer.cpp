@@ -76,17 +76,104 @@ vector<string> Optimizer::process(Clause clause) {
     
     switch (type) {
         case modifies:
-            Modifies &castedClause = dynamic_cast<Modifies&>(clause);
-            process(castedClause);
+            return process(clause.modifiesConverter(clause));
             break;
         case uses:
-            Uses &castedClause = dynamic_cast<Uses&>(clause);
-            process(castedClause);
-            
+            return process(clause.usesConverter(clause));
+			break;
+		case follows:
+			return process(clause.followsConverter(clause));
+			break;
+		case followsS:
+			return process(clause.followsSConverter(clause));
+			break;
+		case parent:
+			return process(clause.parentConverter(clause));
+			break;
+		case parentS:
+			return process(clause.parentSConverter(clause));
+			break;
         default:
             break;
     }
     
+}
+
+
+vector<string> Optimizer::process(Uses clause) {
+
+	int relCase = clause.getRelCase();
+	vector<string> clauseSet;
+	switch (relCase) {
+	case 1:
+		// (defined, defined)
+		set<int> usedByEntity = PKB::uses(clause.getVar1Type(), clause.getVar2());
+		set<int>::iterator find = usedByEntity.find(stoi(clause.getVar1()));
+		if (find != usedByEntity.end()) {
+			// found
+			clauseSet.push_back("0");
+		}
+		else {
+			clauseSet.push_back("-1");
+		}
+		return clauseSet;
+		break;
+	case 2:
+		// (defined, var)
+		EntityType type = clause.getVar1Type();
+		switch (type) {
+		case EntityType::PROCEDURE:
+			set<int> usedByProc = ProcTable::getVarUsedByProc(ProcTable::getProcIndex(clause.getVar1()));
+			for (set<int>::iterator it = usedByProc.begin(); it != usedByProc.end(); ++it) {
+				clauseSet.push_back(to_string(*it));
+			}
+			break;
+		case EntityType::ASSIGN:
+			set<int> usedByStmt = StmtTable::getStmtUses(stoi(clause.getVar1()));
+			set<int> assignStmts = StmtTable::getAssignStmts();
+			set<int> usedByAssign = setIntersect(usedByStmt, assignStmts);
+			for (set<int>::iterator it = usedByAssign.begin(); it != usedByAssign.end(); ++it) {
+				clauseSet.push_back(to_string(*it));
+			}
+			break;
+		case EntityType::WHILE:
+			set<int> usedByStmt = StmtTable::getStmtUses(stoi(clause.getVar1()));
+			set<int> whileStmts = StmtTable::getWhileStmts();
+			set<int> usedByWhile = setIntersect(usedByStmt, whileStmts);
+			for (set<int>::iterator it = usedByWhile.begin(); it != usedByWhile.end(); ++it) {
+				clauseSet.push_back(to_string(*it));
+			}
+			break;
+		case EntityType::STMT:
+			set<int> usedByStmt = StmtTable::getStmtUses(stoi(clause.getVar1()));
+			for (set<int>::iterator it = usedByStmt.begin(); it != usedByStmt.end(); ++it) {
+				clauseSet.push_back(to_string(*it));
+			}
+			break;
+		default:
+			;
+		}
+		break;
+	case 3:
+		// (stmt, defined)
+		set<int> usedByEntity = PKB::uses(clause.getVar1Type(), clause.getVar2());
+		for (set<int>::iterator it = usedByEntity.begin(); it != usedByEntity.end(); ++it) {
+			clauseSet.push_back(to_string(*it));
+		}
+
+		return clauseSet;
+		break;
+	case 4:
+		// (stmt, stmt)
+		// TODO
+		set<int> childrenOfStmt1 = PKB::getChild(clause.getVar1());
+		set<int> parentsOfStmt = PKB::getParent(clause.getVar2());
+		
+		return clauseSet;
+		break;
+	default:
+		;
+	}
 }
 
 vector<string> Optimizer::process(Modifies clause) {
@@ -95,11 +182,10 @@ vector<string> Optimizer::process(Modifies clause) {
     
 	if (relCase == 1) {
 		//(defined1,defined2) case :
-		// use var1 to get defined1 set of values
+		// use var1 to get defined2 set of values
 		set<int> defined2Set = PKB::modifies(clause.getVar1Type(), clause.getVar1());
         // look for var1 in defined1 set
-		if (defined2Set.find(clause.getVar1()) != defined2Set.end()) {
-			// Does this work if set var is the last element?
+		if (defined2Set.find(stoi(clause.getVar1())) != defined2Set.end()) {
 			// Create result vector
 			clauseSet.push_back("0"); // 0 Denotes boolean true
             return clauseSet;
@@ -127,7 +213,7 @@ vector<string> Optimizer::process(Modifies clause) {
 		vector<string> clauseSet;
 		while (it != stmtLst.end()) {
 			set<int> constant2Set = PKB::modifies(argType::stmt, *it);
-			if (constant2Set.find(clause.getVar2()) != constant2Set.end()) {
+			if (constant2Set.find(stoi(clause.getVar2())) != constant2Set.end()) {
 				// constant found, add stmt to clause set
 				clauseSet.push_back(to_string(*it));
 			}
@@ -146,7 +232,7 @@ vector<string> Optimizer::process(Modifies clause) {
                 stmtLst = PKB::getAssignStmts();
                 break;
             case stmt:
-                stmtLst = PKB::get  // What is the API for stmt?
+				stmtLst = PKB::get;// What is the API for stmt?
                 break;
             case WHILE:
                 stmtLst = PKB::getWhileStmts();
@@ -202,8 +288,8 @@ vector<string> Optimizer::process(Follows clause) {
         vector<string> clauseSet;
         set<int>::iterator it = stmtLst.begin();
         while (it != stmtLst.end()) {
-            clause
-            PKB::getFollow(*it)
+		
+			PKB::getFollow(*it);
             it++;
         }
         // Need to know what is the Select variable in order to do
@@ -231,14 +317,14 @@ vector<string> Optimizer::process(FollowsS clause) {
             break;
         case 2:
             // (defined, stmt2)
-            set<int> stmt2Set() = PKB::getFollowStar(clause.getVar1());
-            clauseSet = vectorConverter(stmt2Set());
+            set<int> stmt2Set = PKB::getFollowStar(clause.getVar1());
+            clauseSet = vectorConverter(stmt2Set);
             return clauseSet;
             break;
         case 3:
             // (stmt1, defined)
-            set<int> stmt1Set() = PKB::isFollowByStar(clause.getVar2());
-            clauseSet = vectorConverter(stmt2Set());
+            set<int> stmt1Set = PKB::isFollowByStar(clause.getVar2());
+            clauseSet = vectorConverter(stmt2Set);
             return clauseSet;
             break;
         case 4:
@@ -258,7 +344,7 @@ vector<string> Optimizer::process(Parent clause) {
     switch (relCase) {
         case 1:
             // (defined, defined)
-            if (isParent(clause.getVar1(), clause.getVar2())) {
+            if (PKB::isParent(clause.getVar1(), clause.getVar2())) {
                 clauseSet.push_back("0");
             } else {
                 clauseSet.push_back("-1");
@@ -294,7 +380,7 @@ vector<string> Optimizer::process(ParentS clause) {
     switch (relCase) {
         case 1:
             // (defined, defined)
-            if (isParentStar(clause.getVar1(), clause.getVar2())) {
+            if (PKB::isParentStar(clause.getVar1(), clause.getVar2())) {
                 clauseSet.push_back("0");
             } else {
                 clauseSet.push_back("-1");

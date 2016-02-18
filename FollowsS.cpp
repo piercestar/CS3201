@@ -5,6 +5,11 @@ FollowsS::FollowsS(argType _var1Type, string _var1, argType _var2Type, string _v
     
 }
 
+FollowsS::FollowsS(argType _var1Type, string _var1, argType _var2Type, string _var2)
+	: Clause(relType::followsS, _var1Type, _var1, _var2Type, _var2) {
+
+}
+
 int FollowsS::getRelCase(){
     
     if (var1Type == argType::stmt && var2Type == argType::stmt) {

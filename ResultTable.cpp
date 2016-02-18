@@ -43,7 +43,6 @@ vector<vector<string>> ResultTable::mergeVariableSet(vector<vector<string>> vari
         vector<string> clauseToBeRemoved = getClauseSet(i, variableSet);
         vector<string> mergedClauseSet = getClauseSet(i-1, variableSet);
         vector<string>::iterator it = mergedClauseSet.begin();
-        cout << "" << endl;
         while (it != mergedClauseSet.end()) {
             if (!contains(clauseToBeRemoved, (*it))) {
                 it = (mergedClauseSet.erase(it));
@@ -62,7 +61,9 @@ vector<vector<string>> ResultTable::mergeVariableSet(vector<vector<string>> vari
 list<string> ResultTable::getFinalResults() {
     list<string> finalResults;
     
-    
+    // Iteration 1, no permutation just get the string and turn into list<string>
+	vector<string> resultSet = *(finalTable.begin());
+	copy(resultSet.begin() , resultSet.end(), std::back_inserter(finalResults));
     
     return finalResults;
 }
